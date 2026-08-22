@@ -21,7 +21,7 @@ over-the-air firmware flasher for BES (Bestechnic) chips.
 ## usage
 by the way, this script is integrated into the openqore project. if you want to flash your headphones with custom firmware, please read the [openqore](https://github.com/nnonickreal/openqore) guides.
 
-**note:** i'm not responsible for any damage caused as a result of incorrect use of this script or any bugs it may contain.
+**note:** i'm not responsible for any damage caused as a result of incorrect use of this script or any bugs it may contain. this script was created with the assist of AI, but it has been tested on actual hardware (i use besota all the time).
 
 if you want to experiment or do anything else, feel free to continue! c:
 
