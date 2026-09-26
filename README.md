@@ -32,16 +32,21 @@ if you want to experiment or do anything else, feel free to continue! c:
 ```
 git clone https://github.com/nnonickreal/besota
 ```
-**2. install [python](https://www.python.org/downloads/) and pybluez:**
+**2. install [python](https://www.python.org/downloads/) and pybluez with pywebview:**
 
 ```
 pip install git+https://github.com/pybluez/pybluez.git
+pip install pywebview
 ```
 
-**3. launch the script**
-you can just launch the script and follow instructions:
+**3. launch the script or GUI**
+you can just launch the script or GUI and follow instructions:
 ```
 python besota_core.py
+```
+or
+```
+python besota_gui.py
 ```
 
 or e.g. on linux:
