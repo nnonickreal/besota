@@ -1,19 +1,21 @@
 # besota
 over-the-air firmware flasher for BES (Bestechnic) chips.
 
-### supported chips
+### tested chips
 | SoC | status |
 | :--- | :--- |
-| bes2300p | ✅ mostly **supported** (tested on soundcore q35) |
+| bes2300p | ✅ **tested** (on soundcore q35 & q30) |
+| bes1502x/p (aka bes2700*?) | ✅ **tested** (CMF Headphone Pro & Soundcore Space One) |
+| bes1600 (bes27***?) | ✅ **tested** (Nothing Headphone (1)) |
 | bes2300(a) | ❔ probably works but needs testing |
-| bes1502x/p (aka bes2700*?) | ❔ unknown and needs testing |
-| bes1600 (bes27***?) | ❔ unknown and needs testing |
 
 ### things and WIPs
 | feature | status |
 | :--- | :--- |
-| BESOTA v1 (bes2300-2600? chips before 2021) | ✅ |
-| BESOTA v2 (bes1600, 1502*, chips after 2021) | ❌ WIP |
+| BESOTA v1 (bes2300-2500? chips before 2021) | ✅ |
+| BESOTA v1.1 (new chips with LZMA OTA support (2500-2800) | ✅ |
+| GUI | ✅ |
+| BESOTA v2 (new chips with LZMA OTA support (2500-2800) | ❌ WIP |
 | BT scanning on linux | ❌ not implemented (you can only connect with mac address) |
 | support and the list of the chips | ❌ WIP |
 
@@ -37,14 +39,14 @@ pip install git+https://github.com/pybluez/pybluez.git
 ```
 
 **3. launch the script**
-you can just launch the script and follow instructions (pick your firmware, scan or connect to your headphones):
+you can just launch the script and follow instructions:
 ```
-python besota.py
+python besota_core.py
 ```
 
 or e.g. on linux:
 ```
-python besota.py firmware.bin --address aa:bb:cc:dd:ee:ff
+python besota_core.py aa:bb:cc:dd:ee:ff firmware.bin
 ```
 
 run the script with the `-h` parameter to show available arguments.
