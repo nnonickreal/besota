@@ -1,15 +1,4 @@
 #!/usr/bin/env python3
-"""
-besota_gui.py
-=============
-PyWebView front-end launcher for BESOTA. Renders web/index.html and exposes a small
-Python `Api` class as `window.pywebview.api` for the page's JavaScript
-to call into.
-
-All actual protocol / Bluetooth logic stays in besota_core.py - this file
-only bridges JS calls to it and pushes log/progress updates back into the
-page via `window.evaluate_js(...)`.
-"""
 
 from __future__ import annotations
 
@@ -44,14 +33,15 @@ class Api:
 
     def __init__(self):
         self.sock = None
-        self.abort_event: threading.Event | None = None
-        self.firmware_path: str | None = None
+        self.abort_event = None
+        self.firmware_path = None
+        self._window = None
 
     def _bind_window(self, window: webview.Window) -> None:
-        self.window = window
+        self._window = window
 
     def _eval(self, js: str) -> None:
-        win = webview.active_window()
+        win = self._window or webview.active_window()
         if win is not None:
             try:
                 win.evaluate_js(js)
