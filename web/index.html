@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>besota GUI</title>
+<style>
+  @font-face {
+    font-family: "Geist";
+    src: url("fonts/Geist-Regular.ttf") format("truetype");
+    font-weight: 400;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: "ndot47";
+    src: url("fonts/ndot-47.otf") format("opentype");
+    font-weight: 500;
+    font-display: swap;
+  }
+
+  :root {
+    --bg: #000000;
+    --panel: #0d0d0f;
+    --panel-hover: #141417;
+    --fg: #f4f4f5;
+    --fg-dim: #a1a1aa;
+    --fg-dim2: #71717a;
+    --line: rgba(255, 255, 255, 0.14);
+    --line-active: rgba(255, 255, 255, 0.35);
+    --danger: #ff5a4e;
+    --ok: #7dff9e;
+    --radius-lg: 12px;
+    --radius-md: 8px;
+    --radius-sm: 6px;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0; padding: 0;
+    background: var(--bg);
+    color: var(--fg);
+    font-family: "Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    padding: 40px 16px 80px;
+  }
+
+  @keyframes appFadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .app {
+    width: 100%;
+    max-width: 700px;
+    animation: appFadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  .brand {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--line);
+    padding-bottom: 16px;
+    margin-bottom: 24px;
+  }
+
+  .brand-title {
+    font-family: "ndot47", "Geist", monospace;
+    letter-spacing: 0.08em;
+    font-size: 22px;
+    color: var(--fg);
+  }
+
+  .brand-sub {
+    color: var(--fg-dim);
+    font-size: 12px;
+    letter-spacing: 0.04em;
+  }
+  .brand-sub a {
+    color: var(--fg);
+    text-decoration: none;
+    border-bottom: 1px solid var(--line-active);
+  }
+
+  section {
+    border: 1px solid var(--line);
+    padding: 20px;
+    margin-bottom: 16px;
+    border-radius: var(--radius-lg);
+    background: var(--panel);
+    transition: border-color 0.25s ease, background 0.25s ease;
+  }
+  section:hover {
+    border-color: rgba(255, 255, 255, 0.22);
+  }
+
+  section > h2 {
+    font-family: "ndot47", "Geist", monospace;
+    font-weight: 500;
+    font-size: 13px;
+    letter-spacing: 0.08em;
+    margin: 0 0 14px 0;
+    color: var(--fg-dim);
+    text-transform: lowercase;
+  }
+
+  .row {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    flex: 1;
+    min-width: 180px;
+  }
+
+  label {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--fg-dim);
+    letter-spacing: 0.02em;
+  }
+
+  input[type=text], input[type=number], select {
+    background: #000;
+    border: 1px solid var(--line);
+    color: var(--fg);
+    padding: 10px 14px;
+    font-family: inherit;
+    font-size: 13px;
+    outline: none;
+    border-radius: var(--radius-md);
+    transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  input[type=text]:focus, input[type=number]:focus, select:focus {
+    border-color: rgba(255, 255, 255, 0.45);
+    background: #050505;
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.05);
+  }
+
+  select:disabled, input:disabled {
+    color: var(--fg-dim2);
+    border-color: rgba(255, 255, 255, 0.06);
+    background: #080808;
+  }
+
+  .radio-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .radio-opt {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border: 1px solid var(--line);
+    background: #000;
+    padding: 12px 14px;
+    cursor: pointer;
+    border-radius: var(--radius-md);
+    transition: border-color .15s ease, background .15s ease;
+    user-select: none;
+  }
+
+  .radio-opt:hover {
+    background: var(--panel-hover);
+  }
+
+  .radio-opt.selected {
+    border-color: var(--line-active);
+    background: #141418;
+  }
+
+  .radio-opt input[type="radio"] {
+    appearance: none;
+    -webkit-appearance: none;
+    margin: 0;
+    width: 16px;
+    height: 16px;
+    border: 1.5px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    background: transparent;
+    cursor: pointer;
+    display: grid;
+    place-content: center;
+    flex-shrink: 0;
+    transition: border-color .15s ease;
+  }
+
+  .radio-opt input[type="radio"]::before {
+    content: "";
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #ffffff;
+    transform: scale(0);
+    transition: transform .15s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .radio-opt input[type="radio"]:checked {
+    border-color: #ffffff;
+  }
+
+  .radio-opt input[type="radio"]:checked::before {
+    transform: scale(1);
+  }
+
+  .radio-opt-title {
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1.2;
+  }
+
+  button {
+    background: #000;
+    border: 1px solid var(--line);
+    color: var(--fg);
+    padding: 10px 20px;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.03em;
+    cursor: pointer;
+    border-radius: var(--radius-md);
+    transition: background 0.18s cubic-bezier(0.16, 1, 0.3, 1),
+                border-color 0.18s cubic-bezier(0.16, 1, 0.3, 1),
+                color 0.18s cubic-bezier(0.16, 1, 0.3, 1),
+                transform 0.12s cubic-bezier(0.16, 1, 0.3, 1),
+                box-shadow 0.18s ease;
+  }
+
+  button:hover:not(:disabled) {
+    background: #fff;
+    color: #000;
+    border-color: #fff;
+    box-shadow: 0 4px 14px rgba(255, 255, 255, 0.12);
+  }
+
+  button:active:not(:disabled) {
+    transform: scale(0.96);
+  }
+
+  button:disabled {
+    color: var(--fg-dim2) !important;
+    border-color: rgba(255, 255, 255, 0.06) !important;
+    background: #000 !important;
+    cursor: not-allowed;
+    transform: none !important;
+    box-shadow: none !important;
+  }
+
+  @keyframes dangerBreath {
+    0%, 100% { box-shadow: 0 0 6px rgba(255, 90, 78, 0.2); }
+    50%      { box-shadow: 0 0 16px rgba(255, 90, 78, 0.45); }
+  }
+  button.danger:not(:disabled) {
+    border-color: rgba(255, 90, 78, 0.6);
+    color: var(--danger);
+    animation: dangerBreath 2s infinite ease-in-out;
+  }
+
+  button.danger:hover:not(:disabled) {
+    background: var(--danger);
+    color: #fff;
+    border-color: var(--danger);
+    box-shadow: 0 4px 16px rgba(255, 90, 78, 0.4);
+  }
+
+  .filedrop {
+    border: 1px dashed var(--line);
+    background: #000;
+    padding: 24px;
+    text-align: center;
+    font-size: 13px;
+    color: var(--fg-dim);
+    cursor: pointer;
+    border-radius: var(--radius-md);
+    transition: border-color 0.2s ease, background 0.2s ease, color 0.2s ease, transform 0.15s ease;
+  }
+
+  .filedrop:hover {
+    border-color: rgba(255, 255, 255, 0.35);
+    background: var(--panel-hover);
+    color: var(--fg);
+    transform: translateY(-1px);
+  }
+
+  .filedrop:active {
+    transform: scale(0.99);
+  }
+  
+  .filedrop.dragover {
+    border-color: #ffffff;
+    background: var(--panel-hover);
+    box-shadow: 0 0 12px rgba(255, 255, 255, 0.15);
+    transform: scale(1.01);
+  }
+
+  .filemeta {
+    margin-top: 10px;
+    font-size: 12px;
+    color: var(--fg-dim);
+  }
+  .filemeta b { color: var(--fg); }
+
+  .status-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 12px;
+    color: var(--fg-dim);
+  }
+
+  @keyframes pulseGlow {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(125, 255, 158, 0.5); }
+    50%      { box-shadow: 0 0 0 5px rgba(125, 255, 158, 0); }
+  }
+  .dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--fg-dim2);
+    display: inline-block;
+    flex-shrink: 0;
+    transition: background 0.3s ease, box-shadow 0.3s ease;
+  }
+  .dot.on {
+    background: var(--ok);
+    animation: pulseGlow 2.2s infinite cubic-bezier(0.4, 0, 0.6, 1);
+  }
+  .dot.err {
+    background: var(--danger);
+    box-shadow: 0 0 8px rgba(255, 90, 78, 0.5);
+  }
+
+  .progress-wrap {
+    background: #000;
+    border: 1px solid var(--line);
+    height: 10px;
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+  }
+
+  .progress-bar {
+    height: 100%;
+    width: 0%;
+    background: #ffffff;
+    border-radius: var(--radius-sm);
+    box-shadow: 0 0 8px rgba(255, 255, 255, 0.4);
+    transition: width 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .progress-meta {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: var(--fg-dim);
+    margin-top: 8px;
+    font-family: monospace;
+  }
+
+  .log {
+    background: #000;
+    border: 1px solid var(--line);
+    height: 200px;
+    overflow-y: auto;
+    padding: 12px 14px;
+    border-radius: var(--radius-md);
+    font-family: monospace;
+    font-size: 11.5px;
+    line-height: 1.6;
+    color: var(--fg-dim);
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+
+  .log::-webkit-scrollbar { width: 5px; }
+  .log::-webkit-scrollbar-track { background: transparent; }
+  .log::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.15); border-radius: 4px; }
+
+  @keyframes lineAppear {
+    from { opacity: 0; transform: translateX(-4px); }
+    to   { opacity: 1; transform: translateX(0); }
+  }
+  .log > div {
+    animation: lineAppear 0.18s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  .log .l-info { color: var(--fg-dim); }
+  .log .l-ok   { color: var(--ok); }
+  .log .l-err  { color: var(--danger); }
+  .log .l-tx   { color: #ffffff; }
+
+  .notice {
+    border: 1px solid var(--line);
+    background: var(--panel);
+    padding: 14px 16px;
+    font-size: 12px;
+    color: var(--fg-dim);
+    line-height: 1.5;
+    margin-bottom: 16px;
+    border-radius: var(--radius-lg);
+  }
+  .notice b { color: var(--fg); }
+
+  .footer-note {
+    text-align: center;
+    color: var(--fg-dim2);
+    font-size: 11px;
+    margin-top: 24px;
+    letter-spacing: 0.02em;
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <div class="brand">
+    <div class="brand-title">besota GUI</div>
+    <div class="brand-sub">by <a href="https://github.com/nnonickreal" target="_blank">nnonick</a> :3</div>
+  </div>
+
+  <div class="notice">
+    <b>Connection.</b> Pair the headphones in your OS first, then <b>scan</b> for the device by name, or type its MAC address directly.
+  </div>
+
+  <section>
+    <h2>protocol</h2>
+    <div class="radio-group" id="protocolGroup">
+      <label class="radio-opt selected" data-proto="v1">
+        <input type="radio" name="proto" value="v1" checked>
+        <div>
+          <div class="radio-opt-title">BESOTA V1 &mdash; headphones before ~2022</div>
+        </div>
+      </label>
+      <label class="radio-opt" data-proto="v2">
+        <input type="radio" name="proto" value="v2">
+        <div>
+          <div class="radio-opt-title">BESOTA V1.1 &mdash; headphones after ~2022</div>
+        </div>
+      </label>
+    </div>
+  </section>
+
+  <section>
+    <h2>OTA_BOOT offset</h2>
+    <div class="row">
+      <div class="field">
+        <label for="otaPreset">Offset preset</label>
+        <select id="otaPreset">
+          <option value="0x18000">0x18000 (BES2300 / soundcore Q35 / Q30 &amp; Nothing ear (1))</option>
+          <option value="0x20000">0x20000 (BES2500-2800 / soundcore Space * &amp; Nothing / CMF headphone (*))</option>
+          <option value="custom">Custom...</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="otaCustom">Custom address (hex)</label>
+        <input type="text" id="otaCustom" value="0x18000" spellcheck="false" disabled>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>choose firmware</h2>
+    <div class="filedrop" id="dropZone">
+      Click to browse for a .bin firmware file
+    </div>
+    <div class="filemeta" id="fileMeta">No file selected.</div>
+  </section>
+
+  <section>
+    <h2>connection</h2>
+
+    <div class="row" style="margin-bottom:12px;">
+      <div class="field">
+        <label for="scanName">Device name</label>
+        <input type="text" id="scanName" placeholder="e.g. soundcore" spellcheck="false">
+      </div>
+      <div class="field" style="max-width:110px;">
+        <label for="scanSeconds">Scan, sec</label>
+        <input type="number" id="scanSeconds" value="3" min="1" max="30">
+      </div>
+    </div>
+    <div class="row" style="margin-bottom:12px;">
+      <button id="btnScan">Scan</button>
+    </div>
+
+    <div class="field" style="margin-bottom:12px;">
+      <label for="scanResults">Found devices</label>
+      <select id="scanResults">
+        <option value="">-- no scan results yet --</option>
+      </select>
+    </div>
+
+    <div class="field" style="margin-bottom:12px;">
+      <label for="address">Bluetooth MAC address</label>
+      <input type="text" id="address" placeholder="AA:BB:CC:DD:EE:FF" spellcheck="false">
+    </div>
+
+    <div class="row" style="margin-bottom:12px;">
+      <button id="btnConnect">Connect</button>
+      <button id="btnDisconnect" disabled>Disconnect</button>
+    </div>
+
+    <div class="status-row">
+      <span class="dot" id="connDot"></span>
+      <span id="connStatus">Not connected.</span>
+    </div>
+  </section>
+
+  <section>
+    <h2>flash</h2>
+    <div class="row" style="margin-bottom:14px;">
+      <button id="btnFlash" disabled>Start Flashing</button>
+      <button id="btnAbort" class="danger" disabled>Abort</button>
+    </div>
+
+    <div class="progress-wrap">
+      <div class="progress-bar" id="progressBar"></div>
+    </div>
+    <div class="progress-meta">
+      <span id="progressPct">0.0%</span>
+      <span id="progressBytes">0 / 0 KB</span>
+      <span id="progressSpeed">0.0 KB/s</span>
+      <span id="progressEta">eta --s</span>
+    </div>
+
+    <div class="log" id="log" style="margin-top:14px;"></div>
+  </section>
+
+  <div class="footer-note">besota was written using LLM models for coding and was tested on actual hardware.</div>
+</div>
+
+<script>
+const state = {
+  firmwarePath: null,
+  connected: false,
+  isFlashing: false,
+};
+
+const $ = (id) => document.getElementById(id);
+
+function uiLog(msg, cls) {
+  cls = cls || "l-info";
+  const line = document.createElement("div");
+  line.className = cls;
+  const ts = new Date().toLocaleTimeString();
+  line.textContent = "[" + ts + "] " + msg;
+  const log = $("log");
+  log.appendChild(line);
+  log.scrollTop = log.scrollHeight;
+}
+
+function setStatus(text, kind) {
+  $("connStatus").textContent = text;
+  $("connDot").className = "dot" + (kind === "on" ? " on" : kind === "err" ? " err" : "");
+}
+
+function setProgress(offset, total, speed, eta) {
+  const pct = total ? (offset / total) * 100 : 0;
+  $("progressBar").style.width = pct.toFixed(1) + "%";
+  $("progressPct").textContent = pct.toFixed(1) + "%";
+  $("progressBytes").textContent = Math.floor(offset / 1024) + " / " + Math.floor(total / 1024) + " KB";
+  $("progressSpeed").textContent = speed.toFixed(1) + " KB/s";
+  $("progressEta").textContent = "eta " + Math.max(0, Math.round(eta)) + "s";
+}
+
+function updateFlashButton() {
+  $("btnFlash").disabled = !(state.firmwarePath && state.connected && !state.isFlashing);
+}
+
+document.querySelectorAll(".radio-opt").forEach(opt => {
+  opt.addEventListener("click", () => {
+    document.querySelectorAll(".radio-opt").forEach(o => o.classList.remove("selected"));
+    opt.classList.add("selected");
+    opt.querySelector("input").checked = true;
+
+    const preset = $("otaPreset");
+    if (opt.dataset.proto === "v1") preset.value = "0x18000";
+    if (opt.dataset.proto === "v2") preset.value = "0x20000";
+    onOtaPresetChange();
+  });
+});
+
+function getSelectedProtocol() {
+  const checked = document.querySelector('input[name="proto"]:checked');
+  return checked ? checked.value : "v1";
+}
+
+function onOtaPresetChange() {
+  const preset = $("otaPreset").value;
+  const custom = $("otaCustom");
+  if (preset === "custom") {
+    custom.disabled = false;
+    custom.focus();
+  } else {
+    custom.disabled = true;
+    custom.value = preset;
+  }
+}
+$("otaPreset").addEventListener("change", onOtaPresetChange);
+
+function getOtaAddress() {
+  const preset = $("otaPreset").value;
+  return preset === "custom" ? $("otaCustom").value.trim() : preset;
+}
+
+const dropZone = $("dropZone");
+
+['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+  document.body.addEventListener(eventName, e => {
+    e.preventDefault();
+  });
+});
+
+document.body.addEventListener("dragover", (e) => {
+  e.dataTransfer.dropEffect = "copy";
+  dropZone.classList.add("dragover");
+});
+
+document.body.addEventListener("dragleave", (e) => {
+  if (!e.relatedTarget || e.relatedTarget.nodeName === "HTML") {
+    dropZone.classList.remove("dragover");
+  }
+});
+
+document.body.addEventListener("drop", () => {
+  dropZone.classList.remove("dragover");
+});
+
+function onFirmwareSelected(fileInfo) {
+  if (!fileInfo) return;
+  state.firmwarePath = fileInfo.path;
+  $("fileMeta").innerHTML = "<b>" + fileInfo.name + "</b> &middot; " + fileInfo.size.toLocaleString() + " B";
+  uiLog("Selected firmware: " + fileInfo.path, "l-ok");
+  updateFlashButton();
+}
+
+dropZone.addEventListener("click", async () => {
+  const result = await pywebview.api.pick_file();
+  onFirmwareSelected(result);
+});
+
+$("btnScan").addEventListener("click", async () => {
+  const name = $("scanName").value.trim();
+  if (!name) { uiLog("Enter a device name filter first.", "l-err"); return; }
+  const seconds = parseInt($("scanSeconds").value, 10) || 8;
+
+  $("btnScan").disabled = true;
+  $("btnScan").textContent = "Scanning...";
+  uiLog(`Scanning for "${name}" (${seconds}s)...`);
+  await pywebview.api.scan_devices(name, seconds);
+});
+
+function onScanResults(results) {
+  $("btnScan").disabled = false;
+  $("btnScan").textContent = "Scan";
+  const select = $("scanResults");
+  select.innerHTML = "";
+
+  if (!results.length) {
+    select.innerHTML = '<option value="">-- no devices found --</option>';
+    uiLog("No matching devices found.", "l-err");
+    return;
+  }
+
+  results.forEach((d) => {
+    const opt = document.createElement("option");
+    opt.value = d.address;
+    opt.textContent = `${d.name}  [${d.address}]`;
+    select.appendChild(opt);
+  });
+  $("address").value = results[0].address;
+  uiLog(`Found ${results.length} matching device(s).`, "l-ok");
+}
+
+function onScanFailed(err) {
+  $("btnScan").disabled = false;
+  $("btnScan").textContent = "Scan";
+  uiLog("Scan failed: " + err, "l-err");
+}
+
+$("scanResults").addEventListener("change", (e) => {
+  if (e.target.value) $("address").value = e.target.value;
+});
+
+$("btnConnect").addEventListener("click", async () => {
+  const addr = $("address").value.trim().toUpperCase();
+  const macRe = /^([0-9A-F]{2}:){5}[0-9A-F]{2}$/;
+  if (!macRe.test(addr)) {
+    uiLog("Invalid MAC address format.", "l-err");
+    return;
+  }
+
+  $("btnConnect").disabled = true;
+  $("btnConnect").textContent = "Connecting...";
+  setStatus("Looking up BESOTA service...", null);
+  uiLog("Connecting to " + addr + "...");
+  await pywebview.api.connect(addr);
+});
+
+function onConnected(address) {
+  state.connected = true;
+  $("btnConnect").disabled = true;
+  $("btnConnect").textContent = "Connect";
+  $("btnDisconnect").disabled = false;
+  setStatus("Connected to " + address, "on");
+  uiLog("Connected.", "l-ok");
+  updateFlashButton();
+}
+
+function onConnectFailed(err) {
+  $("btnConnect").disabled = false;
+  $("btnConnect").textContent = "Connect";
+  setStatus("Connection failed: " + err, "err");
+  uiLog("Connection failed: " + err, "l-err");
+}
+
+$("btnDisconnect").addEventListener("click", async () => {
+  await pywebview.api.disconnect();
+  state.connected = false;
+  $("btnConnect").disabled = false;
+  $("btnDisconnect").disabled = true;
+  setStatus("Not connected.", null);
+  uiLog("Disconnected.");
+  updateFlashButton();
+});
+
+$("btnFlash").addEventListener("click", async () => {
+  if (!state.firmwarePath) { uiLog("Select a firmware file first.", "l-err"); return; }
+  if (!state.connected) { uiLog("Connect to a device first.", "l-err"); return; }
+
+  state.isFlashing = true;
+  $("btnFlash").disabled = true;
+  $("btnAbort").disabled = false;
+  $("progressBar").style.width = "0%";
+  uiLog("============================================================", "l-tx");
+  uiLog("Starting flash...", "l-tx");
+
+  await pywebview.api.start_flash(getSelectedProtocol(), getOtaAddress());
+});
+
+$("btnAbort").addEventListener("click", async () => {
+  $("btnAbort").disabled = true;
+  uiLog("Abort requested...", "l-err");
+  await pywebview.api.abort();
+});
+
+function onFlashDone(err) {
+  state.isFlashing = false;
+  $("btnAbort").disabled = true;
+
+  state.connected = false;
+  $("btnConnect").disabled = false;
+  $("btnDisconnect").disabled = true;
+  setStatus("Not connected.", null);
+  updateFlashButton();
+
+  if (!err) {
+    uiLog("Done! Firmware update applied, device is rebooting.", "l-ok");
+  } else {
+    uiLog("Fatal: " + err, "l-err");
+  }
+}
+
+window.addEventListener("pywebviewready", () => {
+  uiLog("Ready.", "l-info");
+});
+</script>
+</body>
+</html>
